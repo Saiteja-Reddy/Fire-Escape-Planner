@@ -1,5 +1,7 @@
 #include <bits/stdc++.h>
 #include <curses.h>
+#include <unistd.h>
+
 using namespace std;
  
 #define M 10
@@ -115,7 +117,7 @@ void get_next_step(int grid[M][N], int solution[M][N], int x, int y)
 {
 	if(grid[x][y] == 69)
 	{
-		cout << "Done" << endl;
+		// cout << "Done" << endl;
 		return;
 	}
 
@@ -125,7 +127,7 @@ void get_next_step(int grid[M][N], int solution[M][N], int x, int y)
 	{
 		if(grid[x+1][y] == 69)
 		{
-			cout << "Done" << endl;
+			// cout << "Done" << endl;
 			return;
 		}
 		grid[x+1][y] = 83;
@@ -134,7 +136,7 @@ void get_next_step(int grid[M][N], int solution[M][N], int x, int y)
 	{
 		if(grid[x][y+1] == 69)
 		{
-			cout << "Done" << endl;
+			// cout << "Done" << endl;
 			return;
 		}
 
@@ -144,7 +146,7 @@ void get_next_step(int grid[M][N], int solution[M][N], int x, int y)
 	{
 		if(grid[x-1][y] == 69)
 		{
-			cout << "Done" << endl;
+			// cout << "Done" << endl;
 			return;
 		}
 
@@ -154,7 +156,7 @@ void get_next_step(int grid[M][N], int solution[M][N], int x, int y)
 	{
 		if(grid[x][y-1] == 69)
 		{
-			cout << "Done" << endl;
+			// cout << "Done" << endl;
 			return;
 		}
 
@@ -162,13 +164,36 @@ void get_next_step(int grid[M][N], int solution[M][N], int x, int y)
 	}	
 }
 
+void print_to_screen(WINDOW * win, int mat[M][N])
+{
+	int off_x = 3;
+	int off_y = 3;
 
-void move(int mat[M][N])
+	for (int i = 0; i < M; ++i)
+	{
+		off_y = 3 + i;
+		for (int j = 0; j < N; ++j)
+		{
+			if(mat[i][j] == 0)
+				mvwaddch(win, off_y, off_x + j, '0' | COLOR_PAIR(4));
+			if(mat[i][j] == 1)
+				mvwaddch(win, off_y, off_x + j, '1' | COLOR_PAIR(2));
+			if(mat[i][j] == 83)
+				mvwaddch(win, off_y, off_x + j, 'S' | COLOR_PAIR(5));
+			if(mat[i][j] == 69)
+				mvwaddch(win, off_y, off_x + j, 'E' | COLOR_PAIR(3));			
+		}
+	}
+	wrefresh(win);
+	sleep(1);
+}
+
+void move(WINDOW * win, int mat[M][N])
 {
 	vector <pair<int, int> > starts = find_start(mat);
 	if(starts.size() == 0)
 	{
-		cout << "No one to Escape!" << endl;
+		// cout << "No one to Escape!" << endl;
 		return;
 	}
 	int min_dist = INT_MAX;
@@ -184,11 +209,12 @@ void move(int mat[M][N])
 	{
 		get_next_step(mat, solution, starts[0].first, starts[0].second);
 		// cout << "Done" << endl;
-		print_grid(mat);
+		// print_grid(mat);
+		print_to_screen(win, mat);
 	}
 	else
 	{
-		cout << "Can't Move!!" << endl;
+		// cout << "Can't Move!!" << endl;
 	}
 
 
@@ -211,43 +237,45 @@ int main()
 		{ 1, 0, 0, 1, 0, 0, 0, 0, 0, 1 },
 		{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
 	};
- 
-	// int visited[M][N];
 
-	// memset(visited, 0, sizeof visited);
+	initscr();
+	start_color();	
+	use_default_colors();
+	int h, w;
+   	getmaxyx(stdscr, h, w);
+	WINDOW * win = newwin(h/2, w/4, 5, 5);
+	noecho();
+	curs_set(0);
+	wclear(win);
+	wborder(win, 0, 0, 0, 0, 0, 0, 0, 0);
+
+	init_pair(1, COLOR_RED, -1);	
+	init_pair(2, COLOR_BLACK, -1);	
+	init_pair(3, COLOR_BLUE, -1);	
+	init_pair(4, COLOR_WHITE, -1);	
+	init_pair(5, COLOR_GREEN, -1);	
+
+
+
+	wrefresh(win);
+
+	move(win, mat);
+	move(win, mat);
+	move(win, mat);
+	move(win, mat);
+	move(win, mat);
+	move(win, mat);
+	move(win, mat);
+	move(win, mat);
+	move(win, mat);
+	move(win, mat);
+	move(win, mat);
+	move(win, mat);
+	move(win, mat);
+	move(win, mat);
+	move(win, mat);
+
 	
-	// int min_dist = INT_MAX;
-
-	// vector <pair<int, int> > starts = find_start(mat);
-	
-	// findShortestPath_Util(mat, visited, starts[0].first, starts[0].second, min_dist, 0);
-
-	// get_trajectory_util(mat, solution, starts[0].first, starts[0].second);
-
-	move(mat);
-	move(mat);
-	move(mat);
-	move(mat);
-	move(mat);
-	move(mat);
-	move(mat);
-	move(mat);
-	move(mat);
-	move(mat);
-	move(mat);
-	move(mat);
-	move(mat);
-	move(mat);
-	move(mat);
-
-	// if(min_dist != INT_MAX)
-	// {
-	// 	cout << "The shortest path from source to destination "
-	// 			"has length " << min_dist << endl;
-	// 	print_grid(solution);
-	// }
-	// else 
-	// 	cout << "Destination can't be reached from given source";
-	
+	endwin();
 	return 0;
 }
