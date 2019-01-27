@@ -52,6 +52,7 @@ void findShortestPath(int mat[M][N], int visited[M][N], int i, int j,
 		{
 			min_dist = dist;
 			copy_sol(visited);
+			solution[i][j] = 1;
 		}
 
 
@@ -114,7 +115,7 @@ void get_next_step(int grid[M][N], int solution[M][N], int x, int y)
 {
 	if(grid[x][y] == 69)
 	{
-		cout << "Done";
+		cout << "Done" << endl;
 		return;
 	}
 
@@ -122,18 +123,41 @@ void get_next_step(int grid[M][N], int solution[M][N], int x, int y)
 
 	if(solution[x+1][y])
 	{
+		if(grid[x+1][y] == 69)
+		{
+			cout << "Done" << endl;
+			return;
+		}
 		grid[x+1][y] = 83;
 	} 
 	else if(solution[x][y+1])
 	{
+		if(grid[x][y+1] == 69)
+		{
+			cout << "Done" << endl;
+			return;
+		}
+
 		grid[x][y+1] = 83;
 	}
 	else if(solution[x-1][y])
 	{
+		if(grid[x-1][y] == 69)
+		{
+			cout << "Done" << endl;
+			return;
+		}
+
 		grid[x-1][y] = 83;
 	}
 	else
 	{
+		if(grid[x][y-1] == 69)
+		{
+			cout << "Done" << endl;
+			return;
+		}
+
 		grid[x][y-1] = 83;
 	}	
 }
@@ -142,16 +166,24 @@ void get_next_step(int grid[M][N], int solution[M][N], int x, int y)
 void move(int mat[M][N])
 {
 	vector <pair<int, int> > starts = find_start(mat);
+	if(starts.size() == 0)
+	{
+		cout << "No one to Escape!" << endl;
+		return;
+	}
 	int min_dist = INT_MAX;
 	
 	int visited[M][N];
 	memset(visited, 0, sizeof visited);	
 
 	findShortestPath_Util(mat, visited, starts[0].first, starts[0].second, min_dist, 0);
+	// cout << "solution: " << endl;
+	// print_grid(solution);
 
 	if(min_dist != INT_MAX)
 	{
 		get_next_step(mat, solution, starts[0].first, starts[0].second);
+		// cout << "Done" << endl;
 		print_grid(mat);
 	}
 	else
