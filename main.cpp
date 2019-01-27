@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include <curses.h>
 using namespace std;
  
 #define M 10
@@ -74,6 +75,13 @@ void findShortestPath(int mat[M][N], int visited[M][N], int i, int j,
 	visited[i][j] = 0;
 }
 
+void findShortestPath_Util(int mat[M][N], int visited[M][N], int i, int j,
+				int& min_dist, int dist)
+{
+	memset(solution, 0, sizeof solution);
+	findShortestPath(mat, visited, i, j, min_dist, 0);
+}
+
 vector <pair<int, int> > find_start(int mat[M][N]) 
 {
 	vector <pair<int, int> > a;
@@ -102,32 +110,60 @@ vector <pair<int, int> > find_exit(int mat[M][N])
 	return a;
 }
 
+void get_trajectory(int grid[M][N], int sol[M][N], int mat[M][N], int x, int y)
+{
+	mat[x][y] = 1;
+	print_grid(mat);
+	cout << endl;
+
+	if(grid[x][y] == 69)
+	{
+		cout << "Done";
+		return;
+	}
+
+	mat[x][y] = 0;
+	sol[x][y] = 0;
+
+	if(sol[x+1][y])
+	{
+		get_trajectory(grid, sol, mat, x+1, y);
+	} 
+	else if(sol[x][y+1])
+	{
+		get_trajectory(grid,sol, mat, x, y+1);
+	}
+	else if(sol[x-1][y])
+	{
+		get_trajectory(grid, sol, mat, x-1, y);
+	}
+	else
+	{
+		get_trajectory(grid,sol, mat, x, y-1);
+	}
+
+	return;
+}
+
+void get_trajectory_util(int grid[M][N], int solution[M][N], int x, int y)
+{
+	int sol[M][N];
+	int mat[M][N];
+	for (int i = 0; i < M; ++i)
+		for (int j = 0; j < N; ++j)
+		{
+			sol[i][j] = solution[i][j];
+			mat[i][j] = 0;
+		}
+	get_trajectory(grid, sol, mat, x,  y);
+
+}
+
+
+
+
 int main()
 {
-
-	// int mat[M][N];
-
-	// ifstream file("grid.txt");
-
-	// string line;
-	// int row = -1;
-	// int col = -1;
-
-	// while(getline(file, line))
- //    {
- //    	row++;
- //    	col = 0;
- //        stringstream lineStream(line);
-
- //        int value;
- //        while(lineStream >> value)
- //        {
- //        	mat[row][col++] = value;
- //        }
- //    }
-
- //    print_grid(mat);    
-
 	int mat[M][N] = 
 	{
 		{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
@@ -150,19 +186,16 @@ int main()
 
 	vector <pair<int, int> > starts = find_start(mat);
 	
-	// vector <pair<int, int> > exits = find_exit(mat);
+	findShortestPath_Util(mat, visited, starts[0].first, starts[0].second, min_dist, 0);
 
-	// cout << starts[0].first << starts[0].second << endl;
+	get_trajectory_util(mat, solution, starts[0].first, starts[0].second);
 
-	findShortestPath(mat, visited, starts[0].first, starts[0].second, min_dist, 0);
- 
 	if(min_dist != INT_MAX)
 	{
 		cout << "The shortest path from source to destination "
 				"has length " << min_dist << endl;
 		print_grid(solution);
 	}
-
 	else 
 		cout << "Destination can't be reached from given source";
 	

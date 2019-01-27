@@ -110,56 +110,58 @@ vector <pair<int, int> > find_exit(int mat[M][N])
 	return a;
 }
 
-void get_trajectory(int grid[M][N], int sol[M][N], int mat[M][N], int x, int y)
+void get_next_step(int grid[M][N], int solution[M][N], int x, int y)
 {
-	mat[x][y] = 1;
-	print_grid(mat);
-	cout << endl;
-
 	if(grid[x][y] == 69)
 	{
 		cout << "Done";
 		return;
 	}
 
-	mat[x][y] = 0;
-	sol[x][y] = 0;
+	grid[x][y] = 0;
 
-	if(sol[x+1][y])
+	if(solution[x+1][y])
 	{
-		get_trajectory(grid, sol, mat, x+1, y);
+		grid[x+1][y] = 83;
 	} 
-	else if(sol[x][y+1])
+	else if(solution[x][y+1])
 	{
-		get_trajectory(grid,sol, mat, x, y+1);
+		grid[x][y+1] = 83;
 	}
-	else if(sol[x-1][y])
+	else if(solution[x-1][y])
 	{
-		get_trajectory(grid, sol, mat, x-1, y);
+		grid[x-1][y] = 83;
 	}
 	else
 	{
-		get_trajectory(grid,sol, mat, x, y-1);
+		grid[x][y-1] = 83;
+	}	
+}
+
+
+void move(int mat[M][N])
+{
+	vector <pair<int, int> > starts = find_start(mat);
+	int min_dist = INT_MAX;
+	
+	int visited[M][N];
+	memset(visited, 0, sizeof visited);	
+
+	findShortestPath_Util(mat, visited, starts[0].first, starts[0].second, min_dist, 0);
+
+	if(min_dist != INT_MAX)
+	{
+		get_next_step(mat, solution, starts[0].first, starts[0].second);
+		print_grid(mat);
+	}
+	else
+	{
+		cout << "Can't Move!!" << endl;
 	}
 
-	return;
-}
 
-void get_trajectory_util(int grid[M][N], int solution[M][N], int x, int y)
-{
-	int sol[M][N];
-	int mat[M][N];
-	for (int i = 0; i < M; ++i)
-		for (int j = 0; j < N; ++j)
-		{
-			sol[i][j] = solution[i][j];
-			mat[i][j] = 0;
-		}
-	get_trajectory(grid, sol, mat, x,  y);
 
 }
-
-
 
 
 int main()
@@ -178,26 +180,42 @@ int main()
 		{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
 	};
  
-	int visited[M][N];
+	// int visited[M][N];
 
-	memset(visited, 0, sizeof visited);
+	// memset(visited, 0, sizeof visited);
 	
-	int min_dist = INT_MAX;
+	// int min_dist = INT_MAX;
 
-	vector <pair<int, int> > starts = find_start(mat);
+	// vector <pair<int, int> > starts = find_start(mat);
 	
-	findShortestPath_Util(mat, visited, starts[0].first, starts[0].second, min_dist, 0);
+	// findShortestPath_Util(mat, visited, starts[0].first, starts[0].second, min_dist, 0);
 
-	get_trajectory_util(mat, solution, starts[0].first, starts[0].second);
- 
-	if(min_dist != INT_MAX)
-	{
-		cout << "The shortest path from source to destination "
-				"has length " << min_dist << endl;
-		print_grid(solution);
-	}
-	else 
-		cout << "Destination can't be reached from given source";
+	// get_trajectory_util(mat, solution, starts[0].first, starts[0].second);
+
+	move(mat);
+	move(mat);
+	move(mat);
+	move(mat);
+	move(mat);
+	move(mat);
+	move(mat);
+	move(mat);
+	move(mat);
+	move(mat);
+	move(mat);
+	move(mat);
+	move(mat);
+	move(mat);
+	move(mat);
+
+	// if(min_dist != INT_MAX)
+	// {
+	// 	cout << "The shortest path from source to destination "
+	// 			"has length " << min_dist << endl;
+	// 	print_grid(solution);
+	// }
+	// else 
+	// 	cout << "Destination can't be reached from given source";
 	
 	return 0;
 }
