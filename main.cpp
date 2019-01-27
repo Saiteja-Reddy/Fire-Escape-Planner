@@ -104,14 +104,38 @@ vector <pair<int, int> > find_exit(int mat[M][N])
 
 int main()
 {
+
+	// int mat[M][N];
+
+	// ifstream file("grid.txt");
+
+	// string line;
+	// int row = -1;
+	// int col = -1;
+
+	// while(getline(file, line))
+ //    {
+ //    	row++;
+ //    	col = 0;
+ //        stringstream lineStream(line);
+
+ //        int value;
+ //        while(lineStream >> value)
+ //        {
+ //        	mat[row][col++] = value;
+ //        }
+ //    }
+
+ //    print_grid(mat);    
+
 	int mat[M][N] = 
 	{
 		{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-		{ 1, 'S', 0, 0, 0, 0, 0, 0, 0, 1 },
+		{ 1,83, 0, 0, 0, 0, 0, 0, 0, 1 },
 		{ 1, 0, 0, 0, 1, 0, 1, 0, 0, 1 },
 		{ 1, 0, 0, 0, 1, 0, 1, 0, 0, 1 },
 		{ 1, 1, 1, 1, 1, 0, 1, 1, 1, 1 },
-		{ 'E', 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+		{69, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
 		{ 1, 1, 1, 1, 0, 0, 0, 0, 0, 1 },
 		{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
 		{ 1, 0, 0, 1, 0, 0, 0, 0, 0, 1 },

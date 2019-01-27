@@ -74,6 +74,13 @@ void findShortestPath(int mat[M][N], int visited[M][N], int i, int j,
 	visited[i][j] = 0;
 }
 
+void findShortestPath_Util(int mat[M][N], int visited[M][N], int i, int j,
+				int& min_dist, int dist)
+{
+	memset(solution, 0, sizeof solution);
+	findShortestPath(mat, visited, i, j, min_dist, 0);
+}
+
 vector <pair<int, int> > find_start(int mat[M][N]) 
 {
 	vector <pair<int, int> > a;
@@ -107,11 +114,11 @@ int main()
 	int mat[M][N] = 
 	{
 		{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-		{ 1, 'S', 0, 0, 0, 0, 0, 0, 0, 1 },
+		{ 1,83, 0, 0, 0, 0, 0, 0, 0, 1 },
 		{ 1, 0, 0, 0, 1, 0, 1, 0, 0, 1 },
 		{ 1, 0, 0, 0, 1, 0, 1, 0, 0, 1 },
 		{ 1, 1, 1, 1, 1, 0, 1, 1, 1, 1 },
-		{ 'E', 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+		{69, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
 		{ 1, 1, 1, 1, 0, 0, 0, 0, 0, 1 },
 		{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
 		{ 1, 0, 0, 1, 0, 0, 0, 0, 0, 1 },
@@ -126,11 +133,7 @@ int main()
 
 	vector <pair<int, int> > starts = find_start(mat);
 	
-	// vector <pair<int, int> > exits = find_exit(mat);
-
-	// cout << starts[0].first << starts[0].second << endl;
-
-	findShortestPath(mat, visited, starts[0].first, starts[0].second, min_dist, 0);
+	findShortestPath_Util(mat, visited, starts[0].first, starts[0].second, min_dist, 0);
  
 	if(min_dist != INT_MAX)
 	{
