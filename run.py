@@ -27,33 +27,42 @@ print_grid(grid)
 starts = find_starts(grid)
 print(starts)
 
-def isSafe(grid, sol, x, y):
-	if(x>=0 and y>=0 and x<10 and y<10 and grid[x][y] is not '1' and sol[x][y] is not 'S'):
+def isValid(x, y):
+	if(x >= 0 and y >=0 and x<10 and y<10):
 		return True
 	return False
 
+def isSafe(grid, sol, x, y):
+	if(grid[x][y] == '1' or sol[x][y] == 'S'):
+		return False
+	return True
+
 solution = None
+min_dis = 10000
 
 def solveMazeUtil(grid, x, y, sol, dis):
-	global solution
+	global solution, min_dis
 	if(grid[x][y] == 'E'):
-		sol[x][y] = 'S'
-
-		if solution is None:
-			solution = (deepcopy(sol), dis)
-			return
-
-		if dis < solution[1]:
-			solution = (deepcopy(sol), dis)
+		if dis < min_dis:
+			solution = deepcopy(sol)
+			min_dis = dis
 		return
 
-	if(isSafe(grid, sol, x, y)):
-		sol[x][y] = 'S'
+	sol[x][y] = 'S'
+
+	if(isValid(x, y+1) and isSafe(grid, sol, x, y+1)):
 		solveMazeUtil(grid, x, y+1, sol, dis+1)
+
+	if(isValid(x+1, y) and isSafe(grid, sol, x+1, y)):
 		solveMazeUtil(grid, x+1, y, sol, dis+1)
+
+	if(isValid(x-1, y) and isSafe(grid, sol, x-1, y)):
 		solveMazeUtil(grid, x-1, y, sol, dis+1)
+
+	if(isValid(x, y-1) and isSafe(grid, sol, x, y-1)):
 		solveMazeUtil(grid, x, y-1, sol, dis+1)
-		sol[x][y] = '0'
+	
+	sol[x][y] = '0'
 
 
 def find_path(grid):
@@ -61,7 +70,8 @@ def find_path(grid):
 	 sol = [['0' for x in range(10)] for y in range(10)]
 	 solveMazeUtil(grid, 1, 1, sol, 0)
 	 if solution:
-	 	print_grid(solution[0])
+	 	print_grid(solution)
+	 	# print_grid(solution[0])
 	 else:
 	 	print("No Path Exists!!")
 
