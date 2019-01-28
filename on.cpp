@@ -92,8 +92,20 @@ vector <pair<int, int> > find_start(int mat[M][N])
 	{
 		for (int j = 0; j < N; ++j)
 		{
-			if(mat[i][j] == 'S')
-				a.push_back(make_pair(i, j));
+			if(mat[i][j] >= 'S')
+			{
+				if(mat[i][j] == 'S')
+					a.push_back(make_pair(i, j));
+				else
+				{
+					int r = mat[i][j] - 'S' + 1; 
+					while(r--)
+					{
+						a.push_back(make_pair(i, j));
+					}
+				}
+			}
+
 		}
 	}
 	return a;
@@ -121,7 +133,10 @@ void get_next_step(int grid[M][N], int solution[M][N], int x, int y)
 		return;
 	}
 
-	grid[x][y] = 0;
+	if(grid[x][y] == 83)
+		grid[x][y] = 0;
+	else
+		grid[x][y]--;
 
 	if(solution[x+1][y])
 	{
@@ -130,7 +145,10 @@ void get_next_step(int grid[M][N], int solution[M][N], int x, int y)
 			// cout << "Done" << endl;
 			return;
 		}
-		grid[x+1][y] = 83;
+		if(grid[x+1][y] == 0)
+			grid[x+1][y] = 83;
+		else
+			grid[x+1][y]++;
 	} 
 	else if(solution[x][y+1])
 	{
@@ -139,8 +157,10 @@ void get_next_step(int grid[M][N], int solution[M][N], int x, int y)
 			// cout << "Done" << endl;
 			return;
 		}
-
-		grid[x][y+1] = 83;
+		if(grid[x][y+1] == 0)
+			grid[x][y+1] = 83;
+		else
+			grid[x][y+1]++;
 	}
 	else if(solution[x-1][y])
 	{
@@ -149,8 +169,10 @@ void get_next_step(int grid[M][N], int solution[M][N], int x, int y)
 			// cout << "Done" << endl;
 			return;
 		}
-
-		grid[x-1][y] = 83;
+		if(grid[x-1][y] == 0)
+			grid[x-1][y] = 83;
+		else
+			grid[x-1][y]++;
 	}
 	else
 	{
@@ -159,8 +181,10 @@ void get_next_step(int grid[M][N], int solution[M][N], int x, int y)
 			// cout << "Done" << endl;
 			return;
 		}
-
-		grid[x][y-1] = 83;
+		if(grid[x][y-1] == 0)
+			grid[x][y-1] = 83;
+		else
+			grid[x][y-1]++;
 	}	
 }
 
@@ -178,17 +202,18 @@ void print_to_screen(WINDOW * win, int mat[M][N])
 				mvwaddch(win, off_y, off_x + j, '0' | COLOR_PAIR(4));
 			if(mat[i][j] == 1)
 				mvwaddch(win, off_y, off_x + j, '1' | COLOR_PAIR(2));
-			if(mat[i][j] == 83)
-				mvwaddch(win, off_y, off_x + j, 'S' | COLOR_PAIR(5));
+			if(mat[i][j] >= 83)
+				mvwaddch(win, off_y, off_x + j, mat[i][j] - 83 + '1' | COLOR_PAIR(5));
 			if(mat[i][j] == 69)
 				mvwaddch(win, off_y, off_x + j, 'E' | COLOR_PAIR(3));			
 		}
 	}
 	wrefresh(win);
-	sleep(1);
+	sleep(2);
 }
 
 void move(WINDOW * win, int mat[M][N])
+// void move(int mat[M][N])
 {
 	vector <pair<int, int> > starts = find_start(mat);
 	if(starts.size() == 0)
@@ -196,26 +221,31 @@ void move(WINDOW * win, int mat[M][N])
 		// cout << "No one to Escape!" << endl;
 		return;
 	}
+
+	for(auto& start: starts)
+	{
 	int min_dist = INT_MAX;
 	
 	int visited[M][N];
 	memset(visited, 0, sizeof visited);	
 
-	findShortestPath_Util(mat, visited, starts[0].first, starts[0].second, min_dist, 0);
+	findShortestPath_Util(mat, visited, start.first, start.second, min_dist, 0);
 	// cout << "solution: " << endl;
 	// print_grid(solution);
 
-	if(min_dist != INT_MAX)
-	{
-		get_next_step(mat, solution, starts[0].first, starts[0].second);
-		// cout << "Done" << endl;
-		// print_grid(mat);
-		print_to_screen(win, mat);
+		if(min_dist != INT_MAX)
+		{
+			get_next_step(mat, solution, start.first, start.second);
+			// cout << "Done" << endl;
+			// print_grid(mat);
+		}
+		else
+		{
+			// cout << "Can't Move!!" << endl;
+		}
 	}
-	else
-	{
-		// cout << "Can't Move!!" << endl;
-	}
+	print_to_screen(win, mat);
+
 
 
 
@@ -227,15 +257,15 @@ int main()
 	int mat[M][N] = 
 	{
 		{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-		{ 1,83, 0, 0, 0, 0, 0, 0, 0, 1 },
+		{ 1,83, 0, 0, 0, 0, 0, 0, 0, 83 },
 		{ 1, 0, 0, 0, 1, 0, 1, 0, 0, 1 },
 		{ 1, 0, 0, 0, 1, 0, 1, 0, 0, 1 },
 		{ 1, 1, 1, 1, 1, 0, 1, 1, 1, 1 },
-		{69, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+		{69, 0, 0, 0, 0, 0, 0,83, 0, 1 },
 		{ 1, 1, 1, 1, 0, 0, 0, 0, 0, 1 },
 		{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
 		{ 1, 0, 0, 1, 0, 0, 0, 0, 0, 1 },
-		{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+		{ 1, 1, 1, 1, 1, 1, 1, 1,69, 1 },
 	};
 
 	initscr();
@@ -259,6 +289,7 @@ int main()
 
 	wrefresh(win);
 
+	// move(mat);
 	move(win, mat);
 	move(win, mat);
 	move(win, mat);
