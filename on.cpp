@@ -37,6 +37,7 @@ void print_grid(int visited[M][N])
 }
 
 int solution[M][N];
+int final_x, final_y;
 
 void copy_sol(int visited[M][N])
 {
@@ -55,6 +56,8 @@ void findShortestPath(int mat[M][N], int visited[M][N], int i, int j,
 			min_dist = dist;
 			copy_sol(visited);
 			solution[i][j] = 1;
+			final_x = i;
+			final_y = j;
 		}
 
 
@@ -222,28 +225,59 @@ void move(WINDOW * win, int mat[M][N])
 		return;
 	}
 
+
+	int exits_map[M][N];
+	memset(exits_map, 0, sizeof exits_map);	
+
+	vector <pair<int, int> > mark_exit;	
+
 	for(auto& start: starts)
 	{
-	int min_dist = INT_MAX;
+
+		for(;;)
+		{
+			int min_dist = INT_MAX;
 	
-	int visited[M][N];
-	memset(visited, 0, sizeof visited);	
-
-	findShortestPath_Util(mat, visited, start.first, start.second, min_dist, 0);
-	// cout << "solution: " << endl;
-	// print_grid(solution);
-
-		if(min_dist != INT_MAX)
-		{
-			get_next_step(mat, solution, start.first, start.second);
-			// cout << "Done" << endl;
-			// print_grid(mat);
+			int visited[M][N];
+			memset(visited, 0, sizeof visited);				
+			
+			findShortestPath_Util(mat, visited, start.first, start.second, min_dist, 0);
+			// cout << "solution: " << endl;
+			// print_grid(solution);
+				if(min_dist != INT_MAX)
+				{
+					if(exits_map[final_x][final_y] < 2)
+					{
+						// cout << final_x << " " << final_y << endl;
+						exits_map[final_x][final_y]++;
+						get_next_step(mat, solution, start.first, start.second);
+						break;
+					}
+					else
+					{
+						mark_exit.push_back(make_pair(final_x, final_y));
+						mat[final_x][final_y] = 1;
+						// cout << final_x << " " << final_y << endl;
+					}
+					// cout << "Done" << endl;
+					// print_grid(mat);
+				}
+				else
+				{
+					// cout << "Can't Move!!" << endl;
+					break;
+				}
 		}
-		else
-		{
-			// cout << "Can't Move!!" << endl;
-		}
+		
+		// print_to_screen(win, mat);
+
 	}
+
+	for(auto& exit_n: mark_exit)
+	{
+		mat[exit_n.first][exit_n.second] = 69;
+	}
+
 	print_to_screen(win, mat);
 
 
@@ -261,7 +295,7 @@ int main()
 		{ 1, 0, 0, 0, 1, 0, 1, 0, 0, 1 },
 		{ 1, 0, 0,83, 1, 0, 1, 0, 0, 1 },
 		{ 1, 1, 1, 1, 1, 0, 1, 1, 1, 1 },
-		{69, 0, 0, 0, 0, 0, 0,83, 0, 1 },
+		{69, 0, 0, 83, 0, 0, 0,83, 0, 1 },
 		{ 1, 1, 1, 1, 0, 0, 0, 0, 0, 1 },
 		{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
 		{ 1, 0, 0, 1, 0, 0, 0, 0, 0, 1 },
@@ -285,6 +319,7 @@ int main()
 	init_pair(4, COLOR_WHITE, -1);	
 	init_pair(5, COLOR_GREEN, -1);	
 
+	print_to_screen(win, mat);
 
 
 	wrefresh(win);
