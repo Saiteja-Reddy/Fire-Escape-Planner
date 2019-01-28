@@ -9,7 +9,7 @@ using namespace std;
 
 bool isSafe(int mat[M][N], int visited[M][N], int x, int y)
 {
-	if (mat[x][y] == 1 || visited[x][y])
+	if (mat[x][y] == 1 || mat[x][y] == 12 || visited[x][y])
 		return false;
  
 	return true;
@@ -18,6 +18,14 @@ bool isSafe(int mat[M][N], int visited[M][N], int x, int y)
 bool isValid(int x, int y)
 {
 	if (x < M && y < N && x >= 0 && y >= 0)
+		return true;
+	 
+	return false;
+}
+
+bool isValidFire(int mat[M][N],int x, int y)
+{
+	if (x < M && y < N && x >= 0 && y >= 0 && mat[x][y] == 0)
 		return true;
 	 
 	return false;
@@ -128,6 +136,20 @@ vector <pair<int, int> > find_exit(int mat[M][N])
 	return a;
 }
 
+vector <pair<int, int> > find_fire(int mat[M][N]) 
+{
+	vector <pair<int, int> > a;
+	for (int i = 0; i < M; ++i)
+	{
+		for (int j = 0; j < N; ++j)
+		{
+			if(mat[i][j] == 12)
+				a.push_back(make_pair(i, j));
+		}
+	}
+	return a;
+}
+
 void get_next_step(int grid[M][N], int solution[M][N], int x, int y)
 {
 	if(grid[x][y] == 69)
@@ -209,10 +231,41 @@ void print_to_screen(WINDOW * win, int mat[M][N])
 				mvwaddch(win, off_y, off_x + j, mat[i][j] - 83 + '1' | COLOR_PAIR(5));
 			if(mat[i][j] == 69)
 				mvwaddch(win, off_y, off_x + j, 'E' | COLOR_PAIR(3));			
+			if(mat[i][j] == 12)
+				mvwaddch(win, off_y, off_x + j, 'F' | COLOR_PAIR(6) | A_BOLD);			
+
 		}
 	}
 	wrefresh(win);
 	sleep(2);
+}
+
+
+
+int FC = 0;
+
+void move_fire(int mat[M][N])
+{
+	FC++;
+	if(FC%2 == 0)
+	{
+		int x, y;
+		vector <pair<int, int> > fires = find_fire(mat);
+		for(auto& fire: fires)
+		{
+			x = fire.first;
+			y = fire.second;
+			if(isValidFire(mat, x+1, y))	
+				mat[x+1][y] = 12;
+			if(isValidFire(mat, x-1, y))	
+				mat[x-1][y] = 12;			
+			if(isValidFire(mat, x, y-1))	
+				mat[x][y-1] = 12;			
+			if(isValidFire(mat, x, y+1))	
+				mat[x][y+1] = 12;			
+		}
+	}
+	return;
 }
 
 void move(WINDOW * win, int mat[M][N])
@@ -240,7 +293,7 @@ void move(WINDOW * win, int mat[M][N])
 	
 			int visited[M][N];
 			memset(visited, 0, sizeof visited);				
-			
+
 			findShortestPath_Util(mat, visited, start.first, start.second, min_dist, 0);
 			// cout << "solution: " << endl;
 			// print_grid(solution);
@@ -278,9 +331,9 @@ void move(WINDOW * win, int mat[M][N])
 		mat[exit_n.first][exit_n.second] = 69;
 	}
 
+	move_fire(mat);
+
 	print_to_screen(win, mat);
-
-
 
 
 }
@@ -291,14 +344,14 @@ int main()
 	int mat[M][N] = 
 	{
 		{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-		{ 1,83, 0, 0, 0, 0, 0, 0, 0, 1},
+		{ 1,83, 12, 0, 0, 0, 0, 0, 0, 1},
 		{ 1, 0, 0, 0, 1, 0, 1, 0, 0, 1 },
 		{ 1, 0, 0,83, 1, 0, 1, 0, 0, 1 },
 		{ 1, 1, 1, 1, 1, 0, 1, 1, 1, 1 },
 		{69, 0, 0, 83, 0, 0, 0,83, 0, 1 },
 		{ 1, 1, 1, 1, 0, 0, 0, 0, 0, 1 },
 		{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-		{ 1, 0, 0, 1, 0, 0, 0, 0, 0, 1 },
+		{ 1, 12, 0, 1, 0, 0, 0, 0, 0, 1 },
 		{ 1, 1, 1, 1, 1, 1, 1, 1,69, 1 },
 	};
 
@@ -318,6 +371,7 @@ int main()
 	init_pair(3, COLOR_BLUE, -1);	
 	init_pair(4, COLOR_WHITE, -1);	
 	init_pair(5, COLOR_GREEN, -1);	
+	init_pair(6, COLOR_YELLOW, -1);	
 
 	print_to_screen(win, mat);
 
