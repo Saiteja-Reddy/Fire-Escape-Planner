@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-#include <curses.h>
 #include <unistd.h>
 
 using namespace std;
@@ -213,42 +212,9 @@ void get_next_step(int grid[M][N], int solution[M][N], int x, int y)
 	}	
 }
 
-void print_to_screen(WINDOW * win, int mat[M][N])
-{
-	int off_x = 3;
-	int off_y = 3;
-
-	for (int i = 0; i < M; ++i)
-	{
-		off_y = 3 + i;
-		for (int j = 0; j < N; ++j)
-		{
-			if(mat[i][j] == 0)
-				mvwaddch(win, off_y, off_x + j, '0' | COLOR_PAIR(4));
-			if(mat[i][j] == 1)
-				mvwaddch(win, off_y, off_x + j, '1' | COLOR_PAIR(2));
-			if(mat[i][j] >= 83)
-				mvwaddch(win, off_y, off_x + j, mat[i][j] - 83 + '1' | COLOR_PAIR(5));
-			if(mat[i][j] == 69)
-				mvwaddch(win, off_y, off_x + j, 'E' | COLOR_PAIR(3));			
-			if(mat[i][j] == 12)
-				mvwaddch(win, off_y, off_x + j, 'F' | COLOR_PAIR(6) | A_BOLD);			
-
-		}
-	}
-	wrefresh(win);
-	sleep(1);
-}
-
-
-
-int FC = 0;
-
 void move_fire(int mat[M][N])
 {
-	FC++;
-	if(FC%2 == 0)
-	{
+
 		int x, y;
 		vector <pair<int, int> > fires = find_fire(mat);
 		for(auto& fire: fires)
@@ -264,11 +230,10 @@ void move_fire(int mat[M][N])
 			if(isValidFire(mat, x, y+1))	
 				mat[x][y+1] = 12;			
 		}
-	}
 	return;
 }
 
-void move(WINDOW * win, int mat[M][N])
+void move(int mat[M][N])
 // void move(int mat[M][N])
 {
 	vector <pair<int, int> > starts = find_start(mat);
@@ -322,7 +287,6 @@ void move(WINDOW * win, int mat[M][N])
 				}
 		}
 		
-		// print_to_screen(win, mat);
 
 	}
 
@@ -330,33 +294,21 @@ void move(WINDOW * win, int mat[M][N])
 	{
 		mat[exit_n.first][exit_n.second] = 69;
 	}
-
-	move_fire(mat);
-
-	print_to_screen(win, mat);
-
 }
 
 
 int read_grid(int grid[M][N])
 {
-	char num;
-	ifstream fp("grid.txt");
+	int num;
+	ifstream fp("test.txt");
 	if (! fp) {
 	    cout << "Error, file couldn't be opened" << endl; 
 	    return 0; 
 	}    
 	for(int row = 0; row < M; row++) {  // stop loops if nothing to read
 	   for(int column = 0; column < N; column++){
-	   		fp >> num;
-	   		if(num == '1' || num == '0')
-	   			grid[row][column] = num - '0';
-	   		else if(num == 'S')
-	   			grid[row][column] = 83;
-	   		else if(num == 'E')
-	   			grid[row][column] = 69;
-	   		else if(num == 'F')
-	   			grid[row][column] = 12;	   				   		
+	   		fp >> num;				   		
+	   		grid[row][column] = num;
 	        if ( !fp ) {
 	           cout << "Error reading file for element " << row << "," << column << endl; 
 	           return 0; 
@@ -368,7 +320,7 @@ int read_grid(int grid[M][N])
 
 int write_grid(int grid[M][N])
 {
-	char num;
+	int num;
 	ofstream fp("test.txt");
 	if (! fp) {
 	    cout << "Error, file couldn't be opened" << endl; 
@@ -376,15 +328,7 @@ int write_grid(int grid[M][N])
 	}    
 	for(int row = 0; row < M; row++) {  // stop loops if nothing to read
 	   for(int column = 0; column < N; column++){
-	   		if(grid[row][column] == 1 || grid[row][column] == 0)
-	   			num = grid[row][column] + '0';
-	   		else if(grid[row][column] == 63)
-	   			num = 'S';
-	   		else if(grid[row][column] == 69)
-	   			num = 'E';
-	   		else if(grid[row][column] == 12)
-	   			num = 'F';
-
+	   		num = grid[row][column];
 	   		fp << num << ' ';
 	    }
 	    if(row != M-1)
@@ -393,59 +337,24 @@ int write_grid(int grid[M][N])
 	return 1;	
 }
 
-int main()
+int main(int argc, char const *argv[])
 {
 	int mat[M][N];
 
 	read_grid(mat);
 
-	initscr();
-	start_color();	
-	use_default_colors();
-	int h, w;
-   	getmaxyx(stdscr, h, w);
-	WINDOW * win = newwin(h/2, w/4, 5, 5);
-	noecho();
-	curs_set(0);
-	wclear(win);
-	wborder(win, 0, 0, 0, 0, 0, 0, 0, 0);
-
-	init_pair(1, COLOR_RED, -1);	
-	init_pair(2, COLOR_BLACK, -1);	
-	init_pair(3, COLOR_BLUE, -1);	
-	init_pair(4, COLOR_WHITE, -1);	
-	init_pair(5, COLOR_GREEN, -1);	
-	init_pair(6, COLOR_YELLOW, -1);	
-
-	print_to_screen(win, mat);
-
-
-	wrefresh(win);
-
-	for (int i = 0; i < 20; ++i)
+	int a=strtol(argv[1], nullptr, 0);
+	if (a == 1)
 	{
-		move(win, mat);
+		move(mat);
+		move_fire(mat);
+		write_grid(mat);
+	}
+	else
+	{
+		move(mat);
 		write_grid(mat);
 	}
 
-	// move(mat);
-	// move(win, mat);
-	// move(win, mat);
-	// move(win, mat);
-	// move(win, mat);
-	// move(win, mat);
-	// move(win, mat);
-	// move(win, mat);
-	// move(win, mat);
-	// move(win, mat);
-	// move(win, mat);
-	// move(win, mat);
-	// move(win, mat);
-	// move(win, mat);
-	// move(win, mat);
-	// move(win, mat);
-
-	
-	endwin();
 	return 0;
 }
